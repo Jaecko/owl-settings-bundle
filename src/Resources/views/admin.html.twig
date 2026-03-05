@@ -1,0 +1,57 @@
+{% set prefix = css_class_prefix|default('owl-settings') %}
+{% set groups = owl_settings_groups() %}
+{% set allValues = owl_settings_all() %}
+
+<div class="{{ prefix }}" data-owl-settings>
+    {% if groups|length > 1 %}
+        <nav class="{{ prefix }}__tabs">
+            {% for group in groups %}
+                <button type="button"
+                        class="{{ prefix }}__tab{% if loop.first %} {{ prefix }}__tab--active{% endif %}"
+                        data-owl-settings-tab="{{ group.key }}"
+                >
+                    {% if group.icon %}
+                        <span class="{{ prefix }}__tab-icon">{{ group.icon }}</span>
+                    {% endif %}
+                    {{ group.label }}
+                </button>
+            {% endfor %}
+        </nav>
+    {% endif %}
+
+    {% for group in groups %}
+        <div class="{{ prefix }}__panel{% if loop.first or groups|length == 1 %} {{ prefix }}__panel--active{% endif %}"
+             data-owl-settings-panel="{{ group.key }}"
+        >
+            {% if group.description %}
+                <p class="{{ prefix }}__description">{{ group.description }}</p>
+            {% endif %}
+
+            <form class="{{ prefix }}__form"
+                  data-owl-settings-form="{{ group.key }}"
+                  action="{{ path('owl_settings_save_group', { groupKey: group.key }) }}"
+                  method="post"
+            >
+                {% for setting in group.settings %}
+                    {% set qualifiedKey = group.key ~ '.' ~ setting.key %}
+                    {% set currentValue = allValues[qualifiedKey] is defined ? allValues[qualifiedKey] : setting.defaultValue %}
+
+                    {% include '@OwlSettings/field.html.twig' with {
+                        prefix: prefix,
+                        definition: setting,
+                        name: setting.key,
+                        value: currentValue,
+                        idPrefix: 'owl_settings_' ~ group.key,
+                    } only %}
+                {% endfor %}
+
+                <div class="{{ prefix }}__actions">
+                    <button type="submit" class="{{ prefix }}__submit">
+                        Enregistrer
+                    </button>
+                    <span class="{{ prefix }}__status" data-owl-settings-status></span>
+                </div>
+            </form>
+        </div>
+    {% endfor %}
+</div>

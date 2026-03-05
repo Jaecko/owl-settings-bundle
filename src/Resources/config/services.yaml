@@ -1,0 +1,39 @@
+services:
+    OwlConcept\SettingsBundle\Service\SettingsStorage:
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            $settingsTable: '%owl_settings.settings_table%'
+            $preferencesTable: '%owl_settings.preferences_table%'
+
+    OwlConcept\SettingsBundle\Service\SettingsService:
+        arguments:
+            $storage: '@OwlConcept\SettingsBundle\Service\SettingsStorage'
+            $cache: '@cache.app'
+            $security: '@security.helper'
+            $cacheTtl: '%owl_settings.cache_ttl%'
+            $userIdentifierMethod: '%owl_settings.user_identifier_method%'
+        public: true
+
+    OwlConcept\SettingsBundle\Builder\SettingsBuilder:
+        arguments:
+            $settingsService: '@OwlConcept\SettingsBundle\Service\SettingsService'
+            $cssClassPrefix: '%owl_settings.css_class_prefix%'
+        public: true
+
+    OwlConcept\SettingsBundle\Twig\OwlSettingsTwigExtension:
+        arguments:
+            $settingsService: '@OwlConcept\SettingsBundle\Service\SettingsService'
+        tags: ['twig.extension']
+
+    OwlConcept\SettingsBundle\Command\InstallCommand:
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+            $settingsTable: '%owl_settings.settings_table%'
+            $preferencesTable: '%owl_settings.preferences_table%'
+        tags:
+            - { name: 'console.command' }
+
+    OwlConcept\SettingsBundle\Controller\SettingsController:
+        arguments:
+            $settingsService: '@OwlConcept\SettingsBundle\Service\SettingsService'
+        tags: ['controller.service_arguments']

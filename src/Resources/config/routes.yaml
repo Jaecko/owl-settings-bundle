@@ -1,0 +1,9 @@
+owl_settings_save_group:
+    path: /owl-settings/save/{groupKey}
+    controller: OwlConcept\SettingsBundle\Controller\SettingsController::saveGroup
+    methods: [POST]
+
+owl_settings_save_user_preferences:
+    path: /owl-settings/user-preferences/save
+    controller: OwlConcept\SettingsBundle\Controller\SettingsController::saveUserPreferences
+    methods: [POST]

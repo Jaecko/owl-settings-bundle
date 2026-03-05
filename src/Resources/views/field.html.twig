@@ -1,0 +1,100 @@
+{# Parameters: prefix, definition, name, value, idPrefix, inheritFrom (optional) #}
+{% set fieldId = idPrefix ~ '_' ~ name %}
+{% set fieldType = definition.type %}
+
+<div class="{{ prefix }}__field {{ prefix }}__field--{{ fieldType }}"
+     data-owl-settings-field="{{ name }}"
+     {% if inheritFrom is defined and inheritFrom %}data-owl-settings-inherit="{{ inheritFrom }}"{% endif %}
+>
+    <label class="{{ prefix }}__label" for="{{ fieldId }}">
+        {{ definition.label }}
+    </label>
+
+    {% if fieldType == 'text' or fieldType == 'email' or fieldType == 'password' %}
+        <input type="{{ fieldType }}"
+               id="{{ fieldId }}"
+               name="{{ name }}"
+               value="{{ value }}"
+               class="{{ prefix }}__input {{ prefix }}__input--{{ fieldType }}"
+               {% if definition.getOption('placeholder') %}placeholder="{{ definition.getOption('placeholder') }}"{% endif %}
+               {% if definition.getOption('maxlength') %}maxlength="{{ definition.getOption('maxlength') }}"{% endif %}
+               {% if definition.getOption('required') %}required{% endif %}
+        >
+
+    {% elseif fieldType == 'number' %}
+        <input type="number"
+               id="{{ fieldId }}"
+               name="{{ name }}"
+               value="{{ value }}"
+               class="{{ prefix }}__input {{ prefix }}__input--number"
+               {% if definition.getOption('min') is not null %}min="{{ definition.getOption('min') }}"{% endif %}
+               {% if definition.getOption('max') is not null %}max="{{ definition.getOption('max') }}"{% endif %}
+               {% if definition.getOption('step') %}step="{{ definition.getOption('step') }}"{% endif %}
+        >
+
+    {% elseif fieldType == 'boolean' %}
+        <label class="{{ prefix }}__toggle" for="{{ fieldId }}">
+            <input type="hidden" name="{{ name }}" value="0">
+            <input type="checkbox"
+                   id="{{ fieldId }}"
+                   name="{{ name }}"
+                   value="1"
+                   class="{{ prefix }}__toggle-input"
+                   {% if value %}checked{% endif %}
+            >
+            <span class="{{ prefix }}__toggle-slider"></span>
+        </label>
+
+    {% elseif fieldType == 'select' %}
+        <select id="{{ fieldId }}"
+                name="{{ name }}"
+                class="{{ prefix }}__input {{ prefix }}__input--select"
+        >
+            {% for optValue, optLabel in definition.selectOptions %}
+                <option value="{{ optValue }}"{% if value is defined and value == optValue %} selected{% endif %}>
+                    {{ optLabel }}
+                </option>
+            {% endfor %}
+        </select>
+
+    {% elseif fieldType == 'textarea' %}
+        <textarea id="{{ fieldId }}"
+                  name="{{ name }}"
+                  class="{{ prefix }}__input {{ prefix }}__input--textarea"
+                  rows="{{ definition.getOption('rows', 4) }}"
+        >{{ value }}</textarea>
+
+    {% elseif fieldType == 'file' %}
+        <div class="{{ prefix }}__file-wrapper">
+            {% if value %}
+                <div class="{{ prefix }}__file-preview" data-owl-settings-file-preview>
+                    <img src="{{ value }}" alt="Preview" class="{{ prefix }}__file-image">
+                </div>
+            {% endif %}
+            <input type="file"
+                   id="{{ fieldId }}"
+                   name="{{ name }}"
+                   class="{{ prefix }}__input {{ prefix }}__input--file"
+                   {% if definition.getOption('accept') %}accept="{{ definition.getOption('accept') }}"{% endif %}
+            >
+        </div>
+
+    {% elseif fieldType == 'color' %}
+        <input type="color"
+               id="{{ fieldId }}"
+               name="{{ name }}"
+               value="{{ value|default('#000000') }}"
+               class="{{ prefix }}__input {{ prefix }}__input--color"
+        >
+    {% endif %}
+
+    {% if definition.helpText %}
+        <small class="{{ prefix }}__help">{{ definition.helpText }}</small>
+    {% endif %}
+
+    {% if inheritFrom is defined and inheritFrom %}
+        <small class="{{ prefix }}__inherit-info">
+            H&eacute;rite de : {{ inheritFrom }}
+        </small>
+    {% endif %}
+</div>

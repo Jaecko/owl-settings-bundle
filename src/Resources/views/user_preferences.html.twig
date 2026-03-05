@@ -1,0 +1,31 @@
+{% set prefix = css_class_prefix|default('owl-settings') %}
+{% set definitions = owl_user_pref_definitions() %}
+{% set allValues = owl_user_pref_all() %}
+
+<div class="{{ prefix }} {{ prefix }}--user-prefs" data-owl-settings-user-prefs>
+    <form class="{{ prefix }}__form"
+          data-owl-settings-user-form
+          action="{{ path('owl_settings_save_user_preferences') }}"
+          method="post"
+    >
+        {% for definition in definitions %}
+            {% set currentValue = allValues[definition.key] is defined ? allValues[definition.key] : definition.defaultValue %}
+
+            {% include '@OwlSettings/field.html.twig' with {
+                prefix: prefix,
+                definition: definition,
+                name: definition.key,
+                value: currentValue,
+                idPrefix: 'owl_userpref',
+                inheritFrom: definition.inheritFrom is defined ? definition.inheritFrom : null,
+            } only %}
+        {% endfor %}
+
+        <div class="{{ prefix }}__actions">
+            <button type="submit" class="{{ prefix }}__submit">
+                Enregistrer mes pr&eacute;f&eacute;rences
+            </button>
+            <span class="{{ prefix }}__status" data-owl-settings-status></span>
+        </div>
+    </form>
+</div>
